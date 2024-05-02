@@ -9,13 +9,16 @@ export async function POST(req: Request, res: Response) {
   await dbConnect();
 
   try {
+    //extract data as JSON from frontend
     const { username, email, password } = await req.json();
 
+    //Check if the verified user exists
     const existingVerifiedUser = await UserModel.findOne({
       username,
       isVerified: true,
     });
 
+    //send the response of username taken if verified user with the username already exists
     if (existingVerifiedUser) {
       return NextResponse.json(
         {
@@ -28,9 +31,13 @@ export async function POST(req: Request, res: Response) {
       );
     }
 
+    //Find the user by email and produce verify code
     const existingUserByEmail = await UserModel.findOne({ email });
     let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+    //if user exists
+    //  - Check if user is verified : if so send that user already exists, else update the password and save the code in db
+    //  - if User does not exist, simply save the user to database
     if (existingUserByEmail) {
       if (existingUserByEmail.isVerified) {
         return NextResponse.json(
@@ -69,12 +76,14 @@ export async function POST(req: Request, res: Response) {
       await newUser.save();
     }
 
+    //Send the email
     const emailResponse = await sendVerificationEmail(
       email,
       username,
       verifyCode
     );
 
+    //handle the email failure
     if (!emailResponse.success) {
       return NextResponse.json(
         {
