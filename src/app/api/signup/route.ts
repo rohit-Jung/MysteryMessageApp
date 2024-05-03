@@ -99,12 +99,20 @@ export async function POST(req: Request, res: Response) {
     return NextResponse.json(
       {
         success: true,
-        message:
-          "Verification email sent successfully. Please verify your email",
+        message: "User Registration successful. Please verify your email",
       },
       {
         status: 200,
       }
     );
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error registering user:", error);
+    return Response.json(
+      {
+        success: false,
+        message: "Error registering user",
+      },
+      { status: 500 }
+    );
+  }
 }
