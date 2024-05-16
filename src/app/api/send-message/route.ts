@@ -25,6 +25,17 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!user.isAcceptingMessage) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "User is not accepting messages currently",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
     //create the message and push to the db
     const newMessage = { content, createdAt: new Date() };
     user.messages.push(newMessage as Message); //type assertion

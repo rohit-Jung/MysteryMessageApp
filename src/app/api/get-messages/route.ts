@@ -33,20 +33,22 @@ export async function GET(req: Request) {
     //aggregation pipeline:
     //match id, unwind into each document according to message, sort according to createdAt date, group them
     const user = await UserModel.aggregate([
-      { $match: { id: userId } },
-      { $unwind: "messages" },
+      { $match: { _id: userId } },
+      { $unwind: { path: "$messages", preserveNullAndEmptyArrays: true } },
       { $sort: { "messages.createdAt": -1 } },
       { $group: { _id: "$_id", messages: { $push: "$messages" } } },
-    ]);
+    ]).exec();
 
-    if (!user) {
+    console.log("This is user", user);
+
+    if (!user || user.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "Error getting messages from user",
+          message: "User not found",
         },
         {
-          status: 401,
+          status: 404,
         }
       );
     }
@@ -54,8 +56,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Messages retrieved successfully",
-        data: user[0].messages, //object returned by aggregation is an array
+        messages: user[0].messages, //object returned by aggregation is an array
       },
       {
         status: 200,
