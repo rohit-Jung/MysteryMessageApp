@@ -62,7 +62,10 @@ const UserSchema: Schema<User> = new Schema({
     default: true,
     required: true,
   },
-  messages: [MessageSchema],
+  messages: {
+    type: [MessageSchema],
+    default: [],
+  },
 });
 
 const UserModel =

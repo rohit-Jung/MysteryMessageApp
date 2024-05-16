@@ -41,11 +41,11 @@ const VerifyPage = () => {
       });
 
       toast({
-        title: "Verification Success !!",
+        title: "Verification Success",
         description: response.data.message,
       });
 
-      router.replace("/signin");
+      router.replace("/dashboard");
     } catch (error) {
       console.error("Error Signup", error);
 
@@ -53,8 +53,11 @@ const VerifyPage = () => {
       let errorMessage = axiosError.response?.data.message;
 
       toast({
-        title: "Error verifying code !!",
-        description: errorMessage,
+        title: "Verification failed",
+        description:
+          axiosError.response?.data.message ??
+          "An error occurred. Please try again.",
+        variant: "destructive",
         duration: 5000,
       });
     } finally {
